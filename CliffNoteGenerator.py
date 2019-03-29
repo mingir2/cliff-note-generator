@@ -28,8 +28,41 @@ def top_n(tokens, n):
   counter = collections.Counter(tokens)
   return counter.most_common(n)
 
+def bi_grams(tokens):
+  # returns a list of tuples.
+  # This function moves a sliding window of size 2 over tokens, and creates a list of bigrams.
+  # tuples: each tuple has two elements both of them tokens.
+  return [(tokens[i-1], tokens[i]) for i in range(1,len(tokens))]
+  
+def load_stop_words(filename):
+  # read filename and return a list of stopwords
+  if filename is not None:
+    with open(filename, 'r') as file:
+      return file.read().split()
+  return None
+
+def get_titles(text):
+  # tokenize honorifics (Dr. Mr. Mrs. Miss. Ms. Rev. Prof. Sir. etc)
+  regex = re.compile(r"[A-Z]{1}[a-z]{1,3}[.]{1}[ ]{1}")
+  title_tokens = [title.strip(' ').strip('.') for title in regex.findall(text)]
+  regex = re.compile(r"[A-Z]{1}[a-z]{1,3}[ ]{1}")
+  pseudo_titles = [title.strip(' ') for title in regex.findall(text)]
+  return list(set(title_tokens) - set(pseudo_titles))
+
+def find_characters(text, stoplist, top):
+  # Tokenize and clean the text
+  # Convert the list of tokens into a list of bigrams
+  # Filter out all bigrams such that the first word in the bigram is a title and the second word is capitalized
+  # Return the top bigrams as a list of tuples:  The first element is the bigram tuple, the second is the count
+  titles = get_titles(text)
+  grams = bi_grams(split_text_into_tokens(text))
+  grams_cap = [gram for gram in grams if gram[0][0].isupper() and gram[1][0].isupper()]
+  grams_stoplist = [gram for gram in grams_cap if gram[0] not in stoplist and gram[1] not in stoplist]
+  grams_title = [gram for gram in grams_stoplist if gram[0] in titles] 
+  return top_n(grams_title, top)
+
 def visualize_high(tuples, filename):
-  # Bar chart with highest being red
+  # Bar chart with highest being red.
   labels = []
   counts = []
   for t in tuples:
