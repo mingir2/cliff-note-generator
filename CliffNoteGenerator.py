@@ -8,35 +8,25 @@ def read_data(filename):
       return file.read()
   return None
 
-def parse(input):
-  return input.split()
+def split_text_into_tokens(text):
+  # skip single letter words (and numbers)
+  # not match double hyphenated words (Aunt--Poly) (it will be two matches)
+  # keep single hyphenated words (e.g. iron-will)
+  # include the apostrophe in all of its possible uses.
+  # strip off any leading and trailing apostrophes, keep the internal ones 
+  regex = re.compile(r"['A-Za-z0-9]+-?['A-Za-z0-9]+")
+  return [token.strip("'") for token in regex.findall(text)]
 
-def pre_clean(t):
-  # remove/strip/replace all punctuation from the parameter t
-  t = t.replace('.', '')
-  t = t.replace(',', '')
-  t = t.replace('!', ' ')
-  t = t.replace('?', '')
-  t = t.replace('@', '')
-  t = t.replace('--', ' ')
-  t = t.replace('#', ' ')
-  return t
-
-def normalize(words):
+def normalize(tokens):
   # ignore cases
-  return [word.lower() for word in words]
-
-def process_data(text):
-  # call the different stages of
-  # cleaning, parsing, normalizing
-  # return the results as a list
-  return normalize(parse(pre_clean(text)))
+  return [token.lower() for token in tokens]
 
 def top_n(tokens, n):
+  # returns a list of tuples where each tuple contains the word followed by its count.
+  # The count is the number of times the token occurs in tokens.
+  # The parameter n is used to get the n most occurring tokens.
   counter = collections.Counter(tokens)
   return counter.most_common(n)
-
-# VISUALIZATION
 
 def visualize_high(tuples, filename):
   # Bar chart with highest being red
