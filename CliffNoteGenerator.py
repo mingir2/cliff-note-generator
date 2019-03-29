@@ -1,21 +1,15 @@
+import collections
 import matplotlib.pyplot as plt
+import re
 
 def read_data(filename):
-  sentence = "YOU don't know about me without you have read a book by the name of The Adventures of Tom Sawyer; but that ain't no matter"
   if filename is not None:
-    text = ""
-    with open(filename, 'r') as fd:
-      for line in fd:
-        text += line
-    return text
-  return sentence
-
-
-# PROCESS PIPELINE
+    with open(filename, 'r') as file:
+      return file.read()
+  return None
 
 def parse(input):
   return input.split()
-
 
 def pre_clean(t):
   # remove/strip/replace all punctuation from the parameter t
@@ -28,11 +22,9 @@ def pre_clean(t):
   t = t.replace('#', ' ')
   return t
 
-
 def normalize(words):
   # ignore cases
   return [word.lower() for word in words]
-
 
 def process_data(text):
   # call the different stages of
@@ -40,28 +32,11 @@ def process_data(text):
   # return the results as a list
   return normalize(parse(pre_clean(text)))
 
+def top_n(tokens, n):
+  counter = collections.Counter(tokens)
+  return counter.most_common(n)
 
-# COMPUTE PIPELINE
-
-def build_table(words):
-  # builds a dictionary of counts
-  table = {}
-  for word in words:
-    table[word] = table.setdefault(word, 0) + 1
-  return table
-
-
-def top_n(table, n):
-  # sorts the table in reverse order based on the count.
-  # return subset of the table of n size.
-  return sorted(table.items(), key=lambda items: (-items[1], items[0]))[:n]
-
-
-def compute_data(tokens, n):
-  return top_n(build_table(tokens), n)
-
-
-# Visulization
+# VISUALIZATION
 
 def visualize_high(tuples, filename):
   # Bar chart with highest being red
