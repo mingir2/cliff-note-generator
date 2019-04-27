@@ -122,8 +122,28 @@ def split_into_chapters(text):
   return chapters
 
 def get_character_counts(chapters, names):
-  # use the same function as in step 7
   counts = np.array([np.char.count(chapters, n) for n in names])
   counts = np.array([np.cumsum(n) for n in counts])
   counts = counts.T # get the data into the proper shape
   return counts
+
+def simple_graph(counts, names, title):
+  plt.style.use('seaborn')
+  fig = plt.figure()
+  fig.suptitle(title, fontsize=12)
+  subplot = fig.add_subplot(1,1,1)
+  
+  handle = subplot.plot(counts)
+  subplot.legend(handles=handle, loc='upper left', labels=names)
+  
+  subplot.grid(True)
+  subplot.set_xlabel('chapters')
+  subplot.set_ylabel('mentions')
+  
+  
+  ticks = np.linspace(0, counts.shape[0]-1, counts.shape[0])
+  labels = ["{}".format(int(i+1)) for i in ticks]
+  subplot.set_xticks(ticks)
+  subplot.set_xticklabels(labels, fontsize=12)
+  
+  return fig  # return the figure
